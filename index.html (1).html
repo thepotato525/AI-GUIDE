@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 통합 활용 가이드 플랫폼</title>
+    
+    <!-- 폰트: 가독성이 뛰어난 Pretendard 적용 -->
+    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- 아이콘: Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- 스타일링: Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5', // Indigo 600
+                        secondary: '#8B5CF6', // Violet 500
+                        surface: '#F8FAFC',
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #F1F5F9;
+            color: #1E293B;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 탭 전환 시 부드러운 효과를 위한 클래스 */
+        .tab-content {
+            display: none;
+            opacity: 0;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            animation: tabFadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes tabFadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 글래스모피즘 효과 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* 그라데이션 텍스트 */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #4F46E5, #8B5CF6);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center py-4 md:py-6">
+                <!-- Logo -->
+                <div class="flex items-center gap-2 mb-4 md:mb-0">
+                    <i class="ph ph-sparkle text-3xl text-primary"></i>
+                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">AI Guide <span class="text-gradient">Platform</span></h1>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="flex overflow-x-auto w-full md:w-auto hide-scrollbar bg-gray-100 p-1 rounded-xl">
+                    <button class="tab-btn active px-4 py-2.5 text-sm font-semibold rounded-lg whitespace-nowrap transition-all duration-200 text-primary bg-white shadow-sm" data-target="guide-proper">
+                        <i class="ph ph-compass mr-1"></i>올바른 AI 활용법
+                    </button>
+                    <button class="tab-btn px-4 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all duration-200 text-gray-500 hover:text-gray-900 hover:bg-gray-200" data-target="guide-beginner">
+                        <i class="ph ph-egg mr-1"></i>초심자 가이드
+                    </button>
+                    <button class="tab-btn px-4 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all duration-200 text-gray-500 hover:text-gray-900 hover:bg-gray-200" data-target="guide-developer">
+                        <i class="ph ph-code mr-1"></i>개발자 가이드
+                    </button>
+                    <button class="tab-btn px-4 py-2.5 text-sm font-medium rounded-lg whitespace-nowrap transition-all duration-200 text-gray-500 hover:text-gray-900 hover:bg-gray-200" data-target="guide-recommender">
+                        <i class="ph ph-magnifying-glass mr-1"></i>용도별 AI 추천
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- ==========================================
+             1. 올바른 AI 활용법 탭 (Proper Usage)
+             ========================================== -->
+        <section id="guide-proper" class="tab-content active">
+            <div class="text-center mb-12 animate-fade-in-up">
+                <span class="text-primary font-semibold tracking-wide uppercase text-sm">Fundamentals</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mt-2 mb-4">AI를 내 비서로 만드는 핵심 원칙</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">AI는 마법이 아닌 도구입니다. 정확하게 지시하고 원리를 이해해야 100% 활용할 수 있습니다.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mb-4 text-primary text-2xl">
+                        <i class="ph ph-chat-text"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">효과적인 프롬프트 작성법</h3>
+                    <p class="text-gray-600 text-sm mb-4">질문이 구체적일수록 답변도 정교해집니다. 'CREATE' 공식을 기억하세요.</p>
+                    <ul class="space-y-2 text-sm text-gray-700 bg-indigo-50/50 p-4 rounded-xl">
+                        <li><strong>C (Context):</strong> 배경 상황 설명하기</li>
+                        <li><strong>R (Role):</strong> AI에게 역할 부여하기 (예: "너는 마케터야")</li>
+                        <li><strong>E (Explanation):</strong> 명확한 목적 설명</li>
+                        <li><strong>F (Format):</strong> 출력 형태 지정 (표, 글머리기호 등)</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4 text-red-600 text-2xl">
+                        <i class="ph ph-warning"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">할루시네이션(환각) 주의</h3>
+                    <p class="text-gray-600 text-sm mb-4">AI는 때때로 그럴듯한 거짓말을 합니다. 이를 '할루시네이션'이라고 부릅니다.</p>
+                    <div class="bg-gray-50 border-l-4 border-red-400 p-3 text-sm text-gray-700">
+                        <p class="mb-2"><strong>예방 및 대처법:</strong></p>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li>사실 확인(Fact-check)은 필수</li>
+                            <li>"정보의 출처를 함께 제시해줘"라고 요청</li>
+                            <li>최신 정보가 필요한 경우 검색 기능이 있는 AI 사용 (Perplexity 등)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 md:col-span-2 lg:col-span-1">
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4 text-green-600 text-2xl">
+                        <i class="ph ph-brain"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">AI의 작동 원리 이해</h3>
+                    <p class="text-gray-600 text-sm mb-4">LLM(거대 언어 모델)은 기본적으로 <strong>'다음 단어 예측기'</strong>입니다.</p>
+                    <p class="text-sm text-gray-700 mb-3">
+                        입력된 문맥을 바탕으로 확률적으로 가장 적절한 다음 단어를 생성해냅니다. 사람처럼 '생각'하는 것이 아니라 방대한 데이터 패턴을 매칭하는 것이므로, <strong>원하는 패턴(예시 데이터)을 프롬프트에 포함</strong>시켜주면 결과물의 품질이 급격히 상승합니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-fade-in-up" style="animation-delay: 0.2s;">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="ph-fill ph-scales text-primary"></i> 프롬프트 퀄리티 비교 (Before & After)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                        <div class="flex items-center gap-2 text-red-500 font-bold mb-3">
+                            <i class="ph-bold ph-x-circle text-xl"></i> 아쉬운 프롬프트 (추상적)
+                        </div>
+                        <p class="font-mono text-sm bg-white p-3 rounded-lg border border-gray-200 mb-3 shadow-inner">
+                            "다이어트 식단 좀 짜줘"
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <strong>결과:</strong> 닭가슴살, 고구마 등 누구나 아는 일반적인 내용만 나열되며, 질문자의 현재 상황(나이, 예산, 알레르기 등)이 전혀 반영되지 않은 무용지물 답변이 나옵니다.
+                        </p>
+                    </div>
+                    <div class="bg-indigo-50 rounded-xl p-5 border border-indigo-100">
+                        <div class="flex items-center gap-2 text-primary font-bold mb-3">
+                            <i class="ph-bold ph-check-circle text-xl"></i> 훌륭한 프롬프트 (구체적)
+                        </div>
+                        <p class="font-mono text-sm bg-white p-3 rounded-lg border border-indigo-200 mb-3 shadow-inner">
+                            "나는 30대 직장인이고, 한 달에 2kg 감량이 목표야. 점심은 회사 구내식당을 이용하고 저녁만 직접 요리해. 해산물 알레르기가 있으니 제외하고, 1주일치 저녁 식단표를 마크다운 표 형태로 만들어줘."
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <strong>결과:</strong> 알레르기 정보, 식사 가능 환경, 원하는 출력 형태(표)까지 모두 반영된 완벽한 맞춤형 식단표를 얻을 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             2. 초심자 가이드 탭 (Beginner Guide)
+             ========================================== -->
+        <section id="guide-beginner" class="tab-content">
+            <div class="text-center mb-12">
+                <span class="text-secondary font-semibold tracking-wide uppercase text-sm">For Beginners</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mt-2 mb-4">AI, 오늘부터 일상에 적용하기</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">어렵게 생각하지 마세요. 당장 써먹을 수 있는 예시와 학습처를 모았습니다.</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Left: 실생활 프롬프트 예시 -->
+                <div class="flex-1 space-y-6">
+                    <h3 class="text-2xl font-bold flex items-center gap-2 border-b pb-2"><i class="ph ph-magic-wand text-yellow-500"></i> 바로 복사해서 쓰는 실생활 프롬프트</h3>
+                    
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative group">
+                        <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded mb-2">요리/레시피</span>
+                        <p class="text-gray-800 font-medium font-mono text-sm">"냉장고에 계란 3개, 양파 반 개, 두부 반 모가 있어. 요리 초보자도 15분 안에 만들 수 있는 맛있고 건강한 요리 레시피 2가지를 단계별로 알려줘."</p>
+                        <button class="copy-btn absolute top-4 right-4 text-gray-400 hover:text-primary transition-colors" title="복사하기"><i class="ph ph-copy text-xl"></i></button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative group">
+                        <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded mb-2">업무 이메일</span>
+                        <p class="text-gray-800 font-medium font-mono text-sm">"[거래처 이름]에게 지난주 회의 때 요청한 [자료 이름]을 언제쯤 받을 수 있는지 정중하게 물어보는 이메일을 작성해줘. 너무 재촉하는 느낌이 들지 않게 비즈니스 톤으로 써줘."</p>
+                        <button class="copy-btn absolute top-4 right-4 text-gray-400 hover:text-primary transition-colors" title="복사하기"><i class="ph ph-copy text-xl"></i></button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative group">
+                        <span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded mb-2">여행 계획</span>
+                        <p class="text-gray-800 font-medium font-mono text-sm">"부모님(60대)을 모시고 가는 3박 4일 오사카 여행 일정을 표 형태로 짜줘. 걷는 시간이 너무 길지 않아야 하고, 하루에 한 번은 현지 맛집이 포함되어야 해."</p>
+                        <button class="copy-btn absolute top-4 right-4 text-gray-400 hover:text-primary transition-colors" title="복사하기"><i class="ph ph-copy text-xl"></i></button>
+                    </div>
+                </div>
+
+                <!-- Right: 추천 학습 사이트 -->
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold flex items-center gap-2 border-b pb-2 mb-6"><i class="ph ph-books text-indigo-500"></i> 추천 학습 사이트 및 채널</h3>
+                    <div class="grid grid-cols-1 gap-4">
+                        <a href="https://wrtn.ai" target="_blank" class="flex items-center p-4 bg-white rounded-xl border border-gray-100 hover:border-primary hover:shadow-md transition-all">
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mr-4 text-xl">✍️</div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">뤼튼 (Wrtn)</h4>
+                                <p class="text-sm text-gray-500">한국어에 특화된 AI 포털. 다양한 모델을 무료로 쉽게 체험 가능</p>
+                            </div>
+                        </a>
+                        <div class="flex items-center p-4 bg-white rounded-xl border border-gray-100">
+                            <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center mr-4 text-red-500 text-2xl"><i class="ph-fill ph-youtube-logo"></i></div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">추천 유튜브 채널</h4>
+                                <p class="text-sm text-gray-500">"조코딩", "생활코딩", "노마드코더"</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 bg-indigo-50/50 p-5 rounded-xl border border-indigo-100">
+                            <h4 class="font-bold text-indigo-900 mb-3 flex items-center gap-2"><i class="ph-fill ph-student"></i> 추천 온라인 강의</h4>
+                            <ul class="space-y-3">
+                                <li>
+                                    <a href="https://www.inflearn.com/" target="_blank" class="block group">
+                                        <div class="font-semibold text-gray-800 group-hover:text-primary transition-colors">인프런 (Inflearn) - AI 입문/프롬프트 강의</div>
+                                        <div class="text-xs text-gray-500 mt-1">한국어 실무 강의가 가장 많은 플랫폼입니다. 평점 높은 무료 입문 강의부터 시작해보세요.</div>
+                                    </a>
+                                </li>
+                                <li class="pt-3 border-t border-indigo-100">
+                                    <a href="https://www.coursera.org/learn/prompt-engineering" target="_blank" class="block group">
+                                        <div class="font-semibold text-gray-800 group-hover:text-primary transition-colors">Coursera - Prompt Engineering for ChatGPT</div>
+                                        <div class="text-xs text-gray-500 mt-1">Vanderbilt 대학교에서 제공하는 글로벌 인기 강의. 체계적인 프롬프트 작성의 정석을 배웁니다.</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             3. 개발자 가이드 탭 (Developer Guide)
+             ========================================== -->
+        <section id="guide-developer" class="tab-content">
+            <div class="bg-gray-900 text-white rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+                <!-- Background decoration -->
+                <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-primary opacity-20 blur-3xl"></div>
+                
+                <div class="relative z-10">
+                    <span class="text-blue-400 font-bold tracking-wider uppercase text-xs mb-2 block">For Developers & Makers</span>
+                    <h2 class="text-3xl md:text-5xl font-extrabold mb-4">Vibe Coding의 시대</h2>
+                    <p class="text-gray-300 text-lg max-w-3xl mb-8">
+                        더 이상 모든 코드를 타이핑할 필요가 없습니다. 기획안과 프롬프트(자연어)만으로 앱을 만들고 배포하는 '바이브 코딩'을 시작하세요.
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                        <!-- Left Column: IDEs & HTML Conversion -->
+                        <div class="flex flex-col gap-6">
+                            
+                            <!-- IDEs (축소된 버전) -->
+                            <div class="bg-gray-800/50 p-5 rounded-2xl border border-gray-700 backdrop-blur-sm flex-1">
+                                <h3 class="text-lg font-bold flex items-center gap-2 mb-4 text-white"><i class="ph ph-terminal-window text-blue-400"></i> AI 통합 IDE & 도구</h3>
+                                <ul class="space-y-2">
+                                    <li>
+                                        <a href="https://cursor.com" target="_blank" class="flex items-start p-2 -mx-2 rounded-xl hover:bg-gray-700/50 transition-colors group">
+                                            <span class="bg-blue-500/20 text-blue-400 p-1.5 rounded mr-3 mt-0.5 group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="ph-fill ph-cursor"></i></span>
+                                            <div>
+                                                <strong class="text-gray-100 block text-sm group-hover:text-blue-400 transition-colors">Cursor AI <i class="ph ph-arrow-up-right text-xs opacity-50"></i></strong>
+                                                <span class="text-xs text-gray-400">VS Code 기반. 코드베이스 전체를 이해하는 현존 최고의 AI 에디터.</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://github.com/features/copilot" target="_blank" class="flex items-start p-2 -mx-2 rounded-xl hover:bg-gray-700/50 transition-colors group">
+                                            <span class="bg-purple-500/20 text-purple-400 p-1.5 rounded mr-3 mt-0.5 group-hover:bg-purple-500 group-hover:text-white transition-colors"><i class="ph-fill ph-github-logo"></i></span>
+                                            <div>
+                                                <strong class="text-gray-100 block text-sm group-hover:text-purple-400 transition-colors">GitHub Copilot <i class="ph ph-arrow-up-right text-xs opacity-50"></i></strong>
+                                                <span class="text-xs text-gray-400">전통의 강자. 실시간 자동 완성 및 인라인 챗 기능 제공.</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://claude.ai" target="_blank" class="flex items-start p-2 -mx-2 rounded-xl hover:bg-gray-700/50 transition-colors group">
+                                            <span class="bg-orange-500/20 text-orange-400 p-1.5 rounded mr-3 mt-0.5 group-hover:bg-orange-500 group-hover:text-white transition-colors"><i class="ph-fill ph-robot"></i></span>
+                                            <div>
+                                                <strong class="text-gray-100 block text-sm group-hover:text-orange-400 transition-colors">Claude 3.5 Sonnet <i class="ph ph-arrow-up-right text-xs opacity-50"></i></strong>
+                                                <span class="text-xs text-gray-400">웹 기반 대화형 AI 중 가장 탁월한 코딩 능력과 아키텍처 설계 제공.</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- NEW: 단일 HTML 변환 가이드 -->
+                            <div class="bg-gray-800/50 p-5 rounded-2xl border border-gray-700 backdrop-blur-sm flex-1">
+                                <h3 class="text-lg font-bold flex items-center gap-2 mb-4 text-white"><i class="ph ph-file-html text-orange-400"></i> 코드를 단일 HTML로 변환하기</h3>
+                                <p class="text-xs text-gray-400 mb-3">React 등으로 생성된 코드를 별도 설치 없이 바로 실행 가능한 HTML로 만들고 싶을 때 사용하는 프롬프트 팁입니다.</p>
+                                <div class="space-y-3">
+                                    <div class="bg-gray-900/60 p-3.5 rounded-xl border border-gray-700">
+                                        <h4 class="text-sm font-bold text-gray-200 mb-1.5">1. 처음부터 단일 파일로 요청하기</h4>
+                                        <p class="text-xs text-blue-200 font-mono bg-black/40 p-2.5 rounded border border-gray-700/50">"React 대신 순수 HTML, Tailwind CSS, Vanilla JS를 사용하고, 모든 코드를 외부 파일 분리 없이 하나의 index.html 파일 안에 작성해줘."</p>
+                                    </div>
+                                    <div class="bg-gray-900/60 p-3.5 rounded-xl border border-gray-700">
+                                        <h4 class="text-sm font-bold text-gray-200 mb-1.5">2. 복잡한 코드를 쉽게 변환하기</h4>
+                                        <p class="text-xs text-gray-300 leading-relaxed">
+                                            v0.dev 등에서 만든 React 코드를 복사하여 <strong class="text-orange-300">Claude</strong>나 <strong class="text-green-300">ChatGPT</strong>에 붙여넣고 <span class="bg-gray-800 px-1 py-0.5 rounded text-gray-200">"이 코드를 Node.js 환경 없이 브라우저에서 바로 열 수 있는 단일 HTML 파일로 변환해줘"</span>라고 지시하세요.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Right Column: Deployment -->
+                        <div class="bg-gray-800/50 p-6 rounded-2xl border border-gray-700 backdrop-blur-sm">
+                            <h3 class="text-xl font-bold flex items-center gap-2 mb-4 text-white"><i class="ph ph-rocket-launch text-green-400"></i> 무료/간편 웹사이트 배포</h3>
+                            <p class="text-gray-400 text-sm mb-4">AI가 짜준 HTML/JS 코드나 프레임워크 코드를 무료로 호스팅하세요. 클릭하여 배포 방법을 확인하세요.</p>
+                            <div class="space-y-3" id="deploy-services">
+                                <div class="deploy-card cursor-pointer bg-white border-2 border-primary shadow-sm hover:shadow-md p-4 rounded-xl flex justify-between items-center transition-all duration-200" data-deploy="vercel">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-black rounded-lg flex items-center justify-center font-bold text-white text-lg">▲</div>
+                                        <div>
+                                            <div class="text-gray-900 font-bold text-base">Vercel</div>
+                                            <div class="text-gray-500 text-xs">React, Next.js 최적화</div>
+                                        </div>
+                                    </div>
+                                    <a href="https://vercel.com" target="_blank" class="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-md font-medium hover:bg-gray-200 transition" onclick="event.stopPropagation();">Visit</a>
+                                </div>
+                                <div class="deploy-card cursor-pointer bg-white border-2 border-transparent hover:border-gray-300 shadow-sm hover:shadow-md p-4 rounded-xl flex justify-between items-center transition-all duration-200" data-deploy="netlify">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-teal-50 text-teal-600 rounded-lg flex items-center justify-center text-2xl"><i class="ph-fill ph-diamonds-four"></i></div>
+                                        <div>
+                                            <div class="text-gray-900 font-bold text-base">Netlify</div>
+                                            <div class="text-gray-500 text-xs">단일 HTML 정적 사이트 최적화</div>
+                                        </div>
+                                    </div>
+                                    <a href="https://netlify.com" target="_blank" class="text-xs bg-teal-50 text-teal-700 px-3 py-1 rounded-md font-medium hover:bg-teal-100 transition" onclick="event.stopPropagation();">Visit</a>
+                                </div>
+                                <div class="deploy-card cursor-pointer bg-white border-2 border-transparent hover:border-gray-300 shadow-sm hover:shadow-md p-4 rounded-xl flex justify-between items-center transition-all duration-200" data-deploy="cloudflare">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-orange-50 text-orange-500 rounded-lg flex items-center justify-center text-2xl"><i class="ph-fill ph-cloud"></i></div>
+                                        <div>
+                                            <div class="text-gray-900 font-bold text-base">Cloudflare Pages</div>
+                                            <div class="text-gray-500 text-xs">빠른 속도와 무제한 대역폭</div>
+                                        </div>
+                                    </div>
+                                    <a href="https://pages.cloudflare.com/" target="_blank" class="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-md font-medium hover:bg-orange-200 transition" onclick="event.stopPropagation();">Visit</a>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 bg-white border border-gray-100 shadow-sm rounded-2xl grid">
+                                <!-- Vercel Instructions -->
+                                <div id="instr-vercel" class="deploy-instruction col-start-1 row-start-1 p-6 transition-opacity duration-300 opacity-100 z-10">
+                                    <h4 class="text-gray-900 font-bold text-base mb-4 flex items-center gap-2"><i class="ph-fill ph-git-merge text-primary"></i> 초간단 Vercel 배포 방법 (3-Step)</h4>
+                                    <ol class="text-sm text-gray-600 space-y-4 list-decimal list-inside">
+                                        <li class="border-b border-gray-100 pb-3">
+                                            <strong class="text-gray-800">GitHub 업로드:</strong>
+                                            <span class="block ml-5 mt-1 text-gray-500">작성된 코드(HTML/JS 또는 React 등)를 본인의 GitHub Repository에 Commit하고 Push 합니다.</span>
+                                        </li>
+                                        <li class="border-b border-gray-100 pb-3">
+                                            <strong class="text-gray-800">Vercel과 연동:</strong>
+                                            <span class="block ml-5 mt-1 text-gray-500">Vercel.com에 로그인 후 'Add New Project'를 눌러 방금 업로드한 Repository를 Import(가져오기) 합니다.</span>
+                                        </li>
+                                        <li>
+                                            <strong class="text-gray-800">Deploy (배포) 실행:</strong>
+                                            <span class="block ml-5 mt-1 text-gray-500">프레임워크 설정을 확인하고 'Deploy' 버튼을 누르면 배포가 완료됩니다.</span>
+                                        </li>
+                                    </ol>
+                                </div>
+                                
+                                <!-- Netlify Instructions -->
+                                <div id="instr-netlify" class="deploy-instruction col-start-1 row-start-1 p-6 transition-opacity duration-300 opacity-0 z-0 pointer-events-none">
+                                    <h4 class="text-gray-900 font-bold text-base mb-4 flex items-center gap-2"><i class="ph-fill ph-git-merge text-teal-500"></i> Netlify 드래그 앤 드롭 배포 (3-Step)</h4>
+                                    <ol class="text-sm text-gray-600 space-y-4 list-decimal list-inside">
+                                        <li class="border-b border-gray-100 pb-3">
+                                            <strong class="text-gray-800">파일 준비:</strong>
+                                            <span class="block ml-5 mt-1 text-gray-500">AI가 만들어준 단일 `index.html` 파일을 하나의 폴더 안에 넣습니다.</span>
+                                        </li>
+                                        <li class="border-b border-gray-100 pb-3">
+                                            <strong class="text-gray-800">Netlify 로그인:</strong>
+                                            <span class="block ml-5 mt-1 text-gray-500">Netlify 사이트에 가입/로그인 후 'Sites' 메뉴로 이동합니다.</span>
+                                        </li>
+                                        <li>
+                                            <strong class="text-gray-800">폴더 드래그:</strong>
+                                            <span class="block ml-5 mt-1 text-gray-500">하단의 "Drag and drop your site output folder here" 영역에 준비한 폴더를 끌어다 놓으면 즉시 배포됩니다.</span>
+                                        </li>
+                                    </ol>
+                                </div>
+
+                                <!-- Cloudflare Instructions -->
+                                <div id="instr-cloudflare" class="deploy-instruction col-start-1 row-start-1 p-6 transition-opacity duration-300 opacity-0 z-0 pointer-events-none">
+                                    <h4 class="text-gray-900 font-bold text-base mb-4 flex items-center gap-2"><i class="ph-fill ph-git-merge text-orange-500"></i> Cloudflare Pages 배포 방법 (3-Step)</h4>
+                                    <ol class="text-sm text-gray-600 space-y-4 list-decimal list-inside">
+                                        <li class="border-b border-gray-100 pb-3">
+                                            <strong class="text-gray-800">대시보드 접속:</strong>
+                                            <span class="block ml-5 mt-1 text-gray-500">Cloudflare 가입 후 대시보드 좌측 메뉴에서 'Workers & Pages'를 클릭합니다.</span>
+                                        </li>
+                                        <li class="border-b border-gray-100 pb-3">
+                                            <strong class="text-gray-800">프로젝트 생성:</strong>
+                                            <span class="block ml-5 mt-1 text-gray-500">'Create application' -> 'Pages' 탭을 선택하고 'Connect to Git' (GitHub 연동) 또는 'Direct Upload' (직접 업로드)를 선택합니다.</span>
+                                        </li>
+                                        <li>
+                                            <strong class="text-gray-800">배포 완료:</strong>
+                                            <span class="block ml-5 mt-1 text-gray-500">저장소를 선택하거나 폴더를 업로드한 후 'Save and Deploy'를 클릭하면 전 세계 엣지 네트워크를 통해 초고속으로 배포됩니다.</span>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             4. 용도별 AI 추천 탭 (AI Recommender)
+             ========================================== -->
+        <section id="guide-recommender" class="tab-content">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-2">무엇을 하고 싶으신가요?</h2>
+                <p class="text-gray-600">작업 카테고리를 선택하면 최적의 AI 도구를 추천해 드립니다.</p>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-10" id="filter-buttons">
+                <button class="filter-btn active px-5 py-2.5 rounded-full border-2 border-primary bg-primary text-white font-semibold shadow-md transition-all" data-filter="all">전체 보기</button>
+                <button class="filter-btn px-5 py-2.5 rounded-full border-2 border-gray-200 bg-white text-gray-600 font-medium hover:border-primary hover:text-primary transition-all" data-filter="text">📝 텍스트/기획</button>
+                <button class="filter-btn px-5 py-2.5 rounded-full border-2 border-gray-200 bg-white text-gray-600 font-medium hover:border-primary hover:text-primary transition-all" data-filter="code">💻 코딩/개발</button>
+                <button class="filter-btn px-5 py-2.5 rounded-full border-2 border-gray-200 bg-white text-gray-600 font-medium hover:border-primary hover:text-primary transition-all" data-filter="image">🎨 이미지 생성</button>
+                <button class="filter-btn px-5 py-2.5 rounded-full border-2 border-gray-200 bg-white text-gray-600 font-medium hover:border-primary hover:text-primary transition-all" data-filter="data">📊 데이터 분석</button>
+                <button class="filter-btn px-5 py-2.5 rounded-full border-2 border-gray-200 bg-white text-gray-600 font-medium hover:border-primary hover:text-primary transition-all" data-filter="media">🎵 음악/영상</button>
+            </div>
+
+            <!-- AI Tool Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="ai-cards-container">
+                <!-- Text Cards -->
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="text">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl">🤖</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">범용/텍스트</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">ChatGPT (GPT-4o)</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">가장 대중적이고 강력한 범용 AI. 아이디어 브레인스토밍, 문서 초안 작성, 번역, 요약 등 모든 텍스트 작업에 압도적인 성능을 보입니다.</p>
+                    <a href="https://chatgpt.com" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="text code">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-2xl">🧠</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">기획/코딩</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Claude 3.5 Sonnet</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">문맥 파악 능력이 뛰어나고 문체가 가장 자연스럽습니다. 정교한 기획서 작성은 물론, 현존 최고 수준의 코딩 및 아키텍처 설계 능력을 자랑합니다.</p>
+                    <a href="https://claude.ai" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="text text-google">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl">✨</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">생태계 연동</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Gemini Pro</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">Google의 AI. Google Docs, Gmail, Drive 등 구글 생태계와 완벽하게 연동되며, 실시간 정보 검색에 강점이 있습니다.</p>
+                    <a href="https://gemini.google.com" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+
+                <!-- Code Cards -->
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="code">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-blue-900 rounded-xl flex items-center justify-center text-2xl">⚡</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">IDE</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Cursor</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">AI가 내장된 코드 에디터. 프로젝트 전체 코드를 읽고 이해하며, 자연어 명령만으로 복잡한 기능을 구현하고 버그를 잡아냅니다.</p>
+                    <a href="https://cursor.sh" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="code">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-white text-2xl text-center font-bold">v0</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">UI 생성</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">v0 by Vercel</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">프롬프트를 입력하면 실시간으로 React/Tailwind 기반의 아름다운 UI 컴포넌트를 생성해줍니다. 프론트엔드 작업 시간을 혁신적으로 줄여줍니다.</p>
+                    <a href="https://v0.dev" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+
+                <!-- Image Cards -->
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="image">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-2xl">⛵</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">고품질 이미지</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Midjourney</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">현재 현존하는 이미지 생성 AI 중 가장 예술적이고 압도적인 퀄리티를 자랑합니다. Discord를 통해 사용합니다.</p>
+                    <a href="https://midjourney.com" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="image">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center text-2xl">🎨</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">정확한 지시</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">DALL-E 3</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">ChatGPT 내에서 바로 사용 가능합니다. 프롬프트를 있는 그대로 가장 정확하게 반영하여 이미지를 그려내는 능력이 탁월합니다.</p>
+                    <a href="https://chatgpt.com" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+
+                <!-- Data Cards -->
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="data">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center text-2xl">📈</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">전문 분석</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Julius AI</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">엑셀, CSV 파일을 업로드하면 데이터를 정제하고, 통계를 내고, 아름다운 차트까지 그려주는 데이터 분석 특화 AI입니다.</p>
+                    <a href="https://julius.ai" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+
+                <!-- Media Cards -->
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="media">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center text-2xl">🎸</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">음악 생성</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Suno AI</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">가사와 장르만 입력하면 전문가 수준의 노래(보컬 포함)를 단 몇 초 만에 만들어내는 혁신적인 음악 생성 AI입니다.</p>
+                    <a href="https://suno.com" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+
+                <div class="tool-card glass-card p-6 rounded-2xl flex flex-col h-full transition-all duration-300" data-category="media">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-2xl">🎬</div>
+                        <span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">영상 생성</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Runway Gen-3</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">텍스트를 입력하거나 정지된 이미지를 넣으면 실사 영화 같은 고품질 비디오 영상을 만들어주는 선두주자입니다.</p>
+                    <a href="https://runwayml.com" target="_blank" class="w-full text-center bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm font-medium transition-colors">웹사이트 이동</a>
+                </div>
+            </div>
+            
+            <!-- 빈 결과 안내 (Javascript로 제어) -->
+            <div id="no-results" class="hidden text-center py-12">
+                <i class="ph ph-empty text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">해당 카테고리에 추천 도구가 없습니다.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
+            <p>&copy; 2026 AI Guide Platform. Created with Vanilla Web Technologies.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. 탭 전환 로직 (Tab Switching)
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 모든 버튼 스타일 초기화
+                    tabBtns.forEach(b => {
+                        b.classList.remove('active', 'text-primary', 'bg-white', 'shadow-sm');
+                        b.classList.add('text-gray-500', 'hover:text-gray-900', 'hover:bg-gray-200');
+                    });
+                    
+                    // 클릭된 버튼 스타일 적용
+                    btn.classList.remove('text-gray-500', 'hover:text-gray-900', 'hover:bg-gray-200');
+                    btn.classList.add('active', 'text-primary', 'bg-white', 'shadow-sm');
+
+                    // 모든 컨텐츠 숨기기
+                    const targetId = btn.getAttribute('data-target');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetId) {
+                            // 약간의 지연을 주어 display:block 후 애니메이션이 적용되도록 함
+                            setTimeout(() => {
+                                content.classList.add('active');
+                            }, 50);
+                        }
+                    });
+                });
+            });
+
+            // 2. 용도별 추천 필터 로직 (AI Recommender Logic)
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const toolCards = document.querySelectorAll('.tool-card');
+            const noResults = document.getElementById('no-results');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 버튼 활성화 상태 변경
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-primary', 'text-white', 'border-primary');
+                        b.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+                    });
+                    btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+                    btn.classList.add('active', 'bg-primary', 'text-white', 'border-primary');
+
+                    const filterValue = btn.getAttribute('data-filter');
+                    let visibleCount = 0;
+
+                    // 카드 필터링 애니메이션
+                    toolCards.forEach(card => {
+                        // 일단 투명하게 만들고 크기를 줄임 (Fade out 효과 준비)
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.95)';
+                        
+                        setTimeout(() => {
+                            if (filterValue === 'all' || card.getAttribute('data-category').includes(filterValue)) {
+                                card.style.display = 'flex';
+                                visibleCount++;
+                                // 다시 보이게 (Fade in)
+                                setTimeout(() => {
+                                    card.style.opacity = '1';
+                                    card.style.transform = 'scale(1)';
+                                }, 50);
+                            } else {
+                                card.style.display = 'none';
+                            }
+
+                            // 결과 없음 UI 처리
+                            if (visibleCount === 0) {
+                                noResults.classList.remove('hidden');
+                            } else {
+                                noResults.classList.add('hidden');
+                            }
+                        }, 300); // CSS 트랜지션 시간(300ms)과 맞춤
+                    });
+                });
+            });
+
+            // 4. 배포 가이드 전환 로직 (Deployment Guide Switcher)
+            const deployCards = document.querySelectorAll('.deploy-card');
+            const deployInstructions = document.querySelectorAll('.deploy-instruction');
+
+            deployCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // 선택된 카드 스타일 처리
+                    deployCards.forEach(c => {
+                        c.classList.remove('border-primary');
+                        c.classList.add('border-transparent');
+                    });
+                    card.classList.remove('border-transparent');
+                    card.classList.add('border-primary');
+
+                    // 선택된 가이드 표시 처리
+                    const targetService = card.getAttribute('data-deploy');
+                    deployInstructions.forEach(instruction => {
+                        if (instruction.id === `instr-${targetService}`) {
+                            instruction.classList.remove('opacity-0', 'z-0', 'pointer-events-none');
+                            instruction.classList.add('opacity-100', 'z-10');
+                        } else {
+                            instruction.classList.remove('opacity-100', 'z-10');
+                            instruction.classList.add('opacity-0', 'z-0', 'pointer-events-none');
+                        }
+                    });
+                });
+            });
+
+            // 3. 복사 버튼 로직 (초심자 가이드 탭)
+            const copyBtns = document.querySelectorAll('.copy-btn');
+            
+            copyBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const textToCopy = e.currentTarget.previousElementSibling.innerText;
+                    
+                    // 클립보드 복사 (구버전 호환성을 위해 execCommand 사용)
+                    const textarea = document.createElement('textarea');
+                    textarea.value = textToCopy;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        
+                        // 아이콘 변경 피드백
+                        const icon = btn.querySelector('i');
+                        icon.classList.remove('ph-copy');
+                        icon.classList.add('ph-check', 'text-green-500');
+                        
+                        setTimeout(() => {
+                            icon.classList.remove('ph-check', 'text-green-500');
+                            icon.classList.add('ph-copy');
+                        }, 2000);
+                        
+                    } catch (err) {
+                        console.error('복사 실패', err);
+                    } finally {
+                        document.body.removeChild(textarea);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
